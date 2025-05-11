@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  
+load_dotenv(override=True)  
 
 def pytest_addoption(parser):
     parser.addoption("--browser", help="Browser to run tests" , default="ch")
