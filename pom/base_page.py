@@ -45,8 +45,8 @@ class BasePage:
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
             ActionChains(self.browser).move_to_element(element).pause(1.5).click(element).perform()
             element.clear()
-            for l in text:
-                element.send_keys(l)
+            for letter in text:
+                element.send_keys(letter)
         except:
             print(f"Element not found: {element}")
             return None

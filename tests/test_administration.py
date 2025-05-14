@@ -61,7 +61,7 @@ def test_add_new_product_admin(browser,base_url):
     save_button = Ap.get_element('#content > div.page-header > div > div > button',"css")
     Ap.click_element(save_button)
 
-    assert Ap.get_element("#alert > div","css") != False
+    assert Ap.get_element("#alert > div","css")
 
 def test_delete_new_product_admin(browser,base_url):
     Ap = AdminPage(browser,base_url)
