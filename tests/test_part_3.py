@@ -1,97 +1,58 @@
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-
-from pom.admin_page import AdminPage
+from pom.admin_page import AdminMainPage
 from pom.main_page import MainPage
-from eom.header import Currency_button,Currency
+from pom.smartphone import SmartphonePage
 import time
 
 
-def test_opencart_scenario_1_login(browser, base_url, load_env):
-    Ac = AdminPage(browser,base_url)
-    Ac.login()
-
-    assert "Dashboard" in Ac.title_admin.text
-    Ac.logout()
+def test_opencart_scenario_1_login(browser, base_url,get_login ):
+    Amp = AdminMainPage(browser,base_url)
+    Amp.login(get_login)
+    assert "Dashboard" in Amp.title_admin.text
+    Amp.logout()
        
 def test_opencart_scenario_2_cart(browser, base_url):
     Mp = MainPage(browser, base_url)
     browser.maximize_window()
-
     time.sleep(2)
 
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
     add_iphone = Mp.add_button_to_cart(2)
     Mp.click_element(add_iphone)
-
     browser.execute_script("window.scrollTo(0, 0);")
+    time.sleep(6)    
+    Mp.click_element(Mp.cart)
 
-    Mp.element_has_gone("#alert .alert alert-success alert-dismissible")
-    
-    cart = Mp.get_element("#top > div > div.nav.float-end > ul > li:nth-child(4)","css")
-
-    time.sleep(6)
-   
-    Mp.click_element(cart)
-    
-    content_cart = Mp.get_element( '#shopping-cart > div > table > tbody > tr > td.text-start.text-wrap > a' , "css")
- 
-    assert "iPhone" in content_cart.text
+    assert "iPhone" in Mp.content_cart.text
 
 def test_opencart_scenario_3_change_currency_main(browser, base_url):
     Mp = MainPage(browser,base_url)
-
-    prices_1 = Mp.get_prices()
-
-    currency_button_on_main = Currency_button(browser,'#form-currency')
-
-    Mp.click_element(currency_button_on_main)
-
-    euro = Currency(browser,1)
     
+    prices_1 = Mp.get_prices
+
+    Mp.click_element(Mp.Currency_button)
+    euro = Mp.Currency(id_curruncy = 1)
     Mp.click_element(euro)
-    
-    prices_2 = Mp.get_prices()
+    prices_2 = Mp.get_prices
 
-    currency_button_on_main = Currency_button(browser,'#form-currency')
-    
-    Mp.click_element(currency_button_on_main)
-
-    gbp = Currency(browser,2)
-    
+    Mp.click_element(Mp.Currency_button)
+    gbp = Mp.Currency(id_curruncy = 2)
     Mp.click_element(gbp)
-
-    prices_3 = Mp.get_prices()
+    prices_3 = Mp.get_prices
 
     assert prices_1 != prices_2 != prices_3
 
 def test_opencart_scenario_4_change_currency_catalog(browser, base_url):
+    Sp = SmartphonePage(browser,base_url)
+    prices_1 = Sp.get_prices
+
+    Sp.click_element(Sp.Currency_button)
+    euro = Sp.Currency(1)
+    Sp.click_element(euro)
+    prices_2 = Sp.get_prices
     
-    Mp = MainPage(browser,base_url, path="/en-gb/catalog/smartphone")
-
-    prices_1 = Mp.get_prices()
-
-    currency_button_on_main = Currency_button(browser,'#form-currency')
-
-    Mp.click_element(currency_button_on_main)
-
-    euro = Currency(browser,1)
-    
-    Mp.click_element(euro)
-    
-    prices_2 = Mp.get_prices()
-
-    currency_button_on_main = Currency_button(browser,'#form-currency')
-    
-    Mp.click_element(currency_button_on_main)
-
-    usd = Currency(browser,3)
-    
-    Mp.click_element(usd)
-
-    prices_3 = Mp.get_prices()
+    Sp.click_element(Sp.Currency_button)
+    usd = Sp.Currency(3)
+    Sp.click_element(usd)
+    prices_3 = Sp.get_prices
 
     assert prices_1 != prices_2 != prices_3

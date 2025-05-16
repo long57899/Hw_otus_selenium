@@ -1,17 +1,17 @@
 from pom.catalog_page import CatalogPage
 
 def test_opencart_catalog_find_catalog_list(browser, base_url):
-    CatalogPage(browser,base_url).get_element("#column-left > div.list-group.mb-3","css")
+    CatalogPage(browser,base_url).catalog_list
    
 def test_opencart_catalog_find_button_continue(browser, base_url):
-    CatalogPage(browser,base_url).get_element("#content > div > a","css")
+    CatalogPage(browser,base_url).button_continue
     
 def test_opencart_catalog_content_text(browser, base_url):
-    CatalogPage(browser,base_url).get_element("#content > h1","css")
+    CatalogPage(browser,base_url).content_text
     
 def test_opencart_catalog_home(browser, base_url):
-    CatalogPage(browser,base_url).get_element("#error-not-found > ul > li:nth-child(1) > a","css")
+    CatalogPage(browser,base_url).home
 
 def test_opencart_catalog_cameras(browser, base_url):
-    CatalogPage(browser,base_url).get_element("#column-left > div.list-group.mb-3 > a:nth-child(7)","css")
+    CatalogPage(browser,base_url).cameras
    
