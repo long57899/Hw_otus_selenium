@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  
+load_dotenv(override=True)  
 
 def pytest_addoption(parser):
     parser.addoption("--browser", help="Browser to run tests" , default="ch")
@@ -62,7 +62,19 @@ def browser(request):
     driver.quit()
 
 @pytest.fixture(scope="session")
-def load_env():
-    load_dotenv()
+def get_login():
     return {"login":os.getenv("LOGIN"), "password":os.getenv("PASSWORD")} 
 
+@pytest.fixture(scope="session")
+def get_user_data():
+    return {"first_name":"test_first_name",
+            "last_name":"test_last_name",
+            "email":"test-email@gmail.com",
+            "password":"test_password"}
+
+@pytest.fixture(scope="session")
+def product_data():
+    return {"name":"test_product",
+            "meta":"test_meta",
+            "model":"test_model",
+            "ceo":"123"}
