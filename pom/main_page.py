@@ -2,6 +2,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pom.base_page import OpenPageMixin,BasePage
+import allure
 
 class MainPage(BasePage,OpenPageMixin):
     def __init__(self, browser, base_url, path=""):
@@ -23,8 +24,12 @@ class MainPage(BasePage,OpenPageMixin):
     def content_cart(self):
         return super().get_element('#shopping-cart > div > table > tbody > tr > td.text-start.text-wrap > a')
 
+    @allure.step("Произвожу копирование цен на главной странице.")
     @property    
     def get_prices(self):
+
+        self.logger.info("Copy prices on Main page.")
+
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price-new"))
         )

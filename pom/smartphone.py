@@ -2,15 +2,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pom.base_page import BasePage,OpenPageMixin
-
+import allure
 
 class SmartphonePage(BasePage,OpenPageMixin):
     def __init__(self, browser, base_url):
         super().__init__(browser, base_url, path="/en-gb/catalog/smartphone" )
         self.open_page(self.path) 
 
+    @allure.step("Произвожу копирование цен на странице Смартфоны.")
     @property    
     def get_prices(self):
+        '''Сбор цен на странице Смартфоны.'''
+        self.logger.info("Copy prices on page Smartphone.")
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price-new"))
         )
