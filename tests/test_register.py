@@ -22,4 +22,4 @@ def test_register_new_customer(browser,base_url,get_user_data):
     Rp.register(get_user_data)
     time.sleep(2)
     
-    assert "Your Account Has Been Created!" in Rp.result.text
+    assert "Your Account Has Been Created!" in Rp.result().text

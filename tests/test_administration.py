@@ -56,14 +56,15 @@ def test_delete_new_product_admin(browser,base_url,product_data,get_login):
 
     time.sleep(1)
 
-    Aprodp.select_all_on_filter
-    Aprodp.delete_products
-    Aprodp.alert_check.accept()
+    Aprodp.select_all_on_filter()
+    Aprodp.delete_products()
+
+    time.sleep(3)
+    Aprodp.alert_check().accept()
     
     Aprodp.filter_product(product_data)
     time.sleep(1)
     
-    assert "No results!" in Aprodp.form_filter.text
+    assert "No results!" in Aprodp.form_filter().text
     
-
 

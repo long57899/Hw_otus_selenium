@@ -8,6 +8,9 @@ from selenium.webdriver.firefox.options import Options as FFOptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from dotenv import load_dotenv
 import os
+import allure
+import json
+import logging
 
 load_dotenv(override=True)  
 
@@ -56,6 +59,14 @@ def browser(request):
         )
     else:
         raise ValueError(f"Unsupported browser: {browser_name}")
+    
+    allure.attach(
+        name=driver.session_id,
+        body=json.dumps(driver.capabilities, indent=4, ensure_ascii=False),
+        attachment_type=allure.attachment_type.JSON)
+
+    driver.test_name = request.node.name
+    driver.log_level = logging.DEBUG
 
     yield driver
 
