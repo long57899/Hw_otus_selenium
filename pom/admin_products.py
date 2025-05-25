@@ -18,10 +18,10 @@ class AdminProductsPage(BasePage,OpenPageMixin):
         self.logger.info("Start to add new product on Opencart.")
         try:
             self.logger.info(f"Start to input {product_data} on Admin page.")
-            input_name_product = super().get_element('#input-name-1',"Название продукта")
+            input_product_data = super().get_element('#input-name-1',"Название продукта")
             input_meta_product = super().get_element('#input-meta-title-1',"Мета продукта")
             tab_data_product = super().get_element('#form-product > ul > li:nth-child(2) > a',"Таб Данные продукта")
-            super().input_value(input_name_product,product_data.get("name"))
+            super().input_value(input_product_data,product_data.get("name"))
             super().input_value(input_meta_product,product_data.get("meta"))
             super().click_element(tab_data_product)
             time.sleep(1)
@@ -45,40 +45,47 @@ class AdminProductsPage(BasePage,OpenPageMixin):
             attachment_type=allure.attachment_type.PNG)
             raise AssertionError(error_msg) from e       
         
-    @property
     def alert(self):
-        return super().get_element("#alert > div","Модалка предупреждения")
-########
-    @allure.feature("Фильтр по продукту.")    
-    @allure.step("Произвожу поиск {name_product} с помощью фильтра страницы админ.")
-    def filter_product(self,name_product):
-        '''Фильтер функция в админ странице.'''
-        self.logger.info(f"Start to search {name_product} on Admin page.")
+        alert_dict =  super().get_element("#alert > div","Модалка предупреждения")
+        return alert_dict.get("element")
 
-        input_filter =super().get_element("#input-name")
-        super().input_value(input_filter,name_product.get("name"))
-        button_filter = WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#button-filter")))
-        super().click_element(button_filter)
-        self.logger.info(f"End to search {name_product} on Admin page.")
+    @allure.feature("Фильтр по продукту.")    
+    @allure.step('Произвожу поиск продукта с помощью фильтра страницы админ.')
+    def filter_product(self,product_data):
+        '''Фильтер функция в админ странице.'''
+        name = product_data.get("name")
+        self.logger.info(f"Start to search {name} on Admin page.")
+        try:
+            input_filter =super().get_element("#input-name","Поле ввода фильтра")
+            super().input_value(input_filter,name)
+            button_filter = {"element":WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#button-filter"))),"name":"Кнопка фильтрации"}
+            super().click_element(button_filter)
+            self.logger.info(f'End to search {name} on Admin page.')
+        except Exception as e:
+            error_msg ="Error with filter product on modal in Product -> Admin"
+            self.logger.error(error_msg, exc_info=True)
+            allure.attach(
+            self.browser.get_screenshot_as_png(),
+            name="error_filter_product",
+            attachment_type=allure.attachment_type.PNG)
+            raise AssertionError(error_msg) from e  
 
     @allure.step("Выбираю все продукты в окне результатов поиска Админ страницы.")
-    @property
     def select_all_on_filter(self):
         self.logger.info("Push to button select all product on Admin page.")
-        select_all = super().get_element("//*[@id='form-product']//input[1]")
+        select_all = super().get_element("//*[@id='form-product']//input[1]","Пункт выбрать все")
         super().click_element(select_all)
     
     @allure.step("Нажимаю кнопку удалить.")
-    @property
     def delete_products(self):
         self.logger.info("Push to button delete product on Admin page.")
-        button_delete = super().get_element("#content > div.page-header > div > div > button.btn.btn-danger")
+        button_delete = super().get_element("#content > div.page-header > div > div > button.btn.btn-danger","Кнопка удалить")
+        time.sleep(1)
         super().click_element(button_delete)
     
-    @property
     def alert_check(self):
         return WebDriverWait(self.browser, 10).until(EC.alert_is_present())
     
-    @property
     def form_filter(self):
-        return super().get_element("#form-product > div.table-responsive > table > tbody > tr > td")
+        filter = super().get_element("#form-product > div.table-responsive > table > tbody > tr > td","Форма")
+        return filter.get("element")

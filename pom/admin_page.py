@@ -16,21 +16,25 @@ class AdminMainPage(BasePage,OpenPageMixin):
     def login(self,login_data:dict):
         '''Логинация на страницу Администратора.'''
         try:
+            login_field = self.input_login
+            password_field = self.input_password
+
             self.logger.info("Start to login on Opencart.")
             self.logger.info(f"Start to input {login_data} on Opencart.")
-            super().input_value(self.input_login, login_data.get("login"))
-            super().input_value(self.input_password, login_data.get("password"))
+            super().input_value(login_field, login_data.get("login", ""))
+            super().input_value(password_field, login_data.get("password", ""))
             self.logger.info(f"End to input {login_data} on Opencart.")
-            super().click_element(self.button_login)
-            self.logger.info("Now user in Opencart.")
+            self.button_login["element"].click()
+            self.logger.info("Login successful")
 
         except Exception as e:
-            error_msg = f"Проблема логинации на проект с Логином {login_data.get("login")} и паролем {login_data.get("password")}."
+            error_msg = f"Ошибка логина: {str(e)}"
             self.logger.error(error_msg, exc_info=True)
             allure.attach(
-            self.browser.get_screenshot_as_png(),
-            name="login_error",
-            attachment_type=allure.attachment_type.PNG)
+                self.browser.get_screenshot_as_png(),
+                name="login_error",
+                attachment_type=allure.attachment_type.PNG
+            )
             raise AssertionError(error_msg) from e
 
     @allure.feature("Выход из проекта.")
@@ -53,8 +57,8 @@ class AdminMainPage(BasePage,OpenPageMixin):
 
     @property
     def title_admin(self):
-        return self.get_element('#content > div.page-header > div > h1' , "Название титульной страницы.")
-    
+        title = self.get_element('#content > div.page-header > div > h1' , "Название титульной страницы.")
+        return title.get("element")
   
 
 
