@@ -6,13 +6,23 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.firefox.options import Options as FFOptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver import Remote
 from dotenv import load_dotenv
 import os
 import allure
 import json
 import logging
 
-load_dotenv(override=True)  
+load_dotenv(override=True) 
+
+
+
+capabilities = {
+    "browserName":os.environ.get("BROWSER_NAME","chrome"),
+    "browserVersion":os.environ.get("BROWSER_VERSION","128.0")
+}
+    
+
 
 def pytest_addoption(parser):
     parser.addoption("--browser", help="Browser to run tests" , default="ch")
@@ -22,6 +32,9 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--base_url", help="Base application url", default=f"{os.getenv("LOCAL_IP")}:{os.getenv("OPENCART_PORT")}"
+    )
+    parser.addoption(
+        "--mode", help="Method of running tests (locally or remotely)", default="local"
     )
 
 @pytest.fixture(scope="session")
@@ -34,31 +47,45 @@ def browser(request):
     browser_name = request.config.getoption("--browser")
     drivers_storage = request.config.getoption("--drivers")
     headless = request.config.getoption("--headless")
+    launch_mode = request.config.getoption("--mode")
 
-    if browser_name in ["ch", "chrome"]:
+    if launch_mode == "remote":
         options = ChromeOptions()
-        if headless:
-            options.add_argument("headless=new")
-        driver = webdriver.Chrome(
-            service=ChromeService(ChromeDriverManager().install()),
+        options.set_capability("browserName", capabilities["browserName"])
+        options.set_capability("browserVersion", capabilities["browserVersion"])
+        
+        driver = Remote(
+            command_executor=f"{os.getenv('SELENOID_GATEWAY')}/wd/hub",
             options=options
         )
-    elif browser_name in ["ff", "firefox"]:
-        options = FFOptions()
-        if headless:
-            options.add_argument("--headless")
-        driver = webdriver.Firefox(options=options)
-    elif browser_name in ["ya", "yandex"]:
-        options = ChromiumOptions()
-        options.binary_location = f"{os.getenv("YANDEX_BROWSER")}"
-        if headless:
-            options.add_argument("headless=new")
-        driver = webdriver.Chrome(
-            options=options,
-            service=ChromiumService(executable_path=f"{drivers_storage}/yandexdriver.exe"),
-        )
+
+    elif launch_mode in ["lc","local"]:
+        if browser_name in ["ch", "chrome"]:
+            options = ChromeOptions()
+            if headless:
+                options.add_argument("headless=new")
+            driver = webdriver.Chrome(
+                service=ChromeService(ChromeDriverManager().install()),
+                options=options
+            )
+        elif browser_name in ["ff", "firefox"]:
+            options = FFOptions()
+            if headless:
+                options.add_argument("--headless")
+            driver = webdriver.Firefox(options=options)
+        elif browser_name in ["ya", "yandex"]:
+            options = ChromiumOptions()
+            options.binary_location = f"{os.getenv("YANDEX_BROWSER")}"
+            if headless:
+                options.add_argument("headless=new")
+            driver = webdriver.Chrome(
+                options=options,
+                service=ChromiumService(executable_path=f"{drivers_storage}/yandexdriver.exe"),
+            )
+        else:
+            raise ValueError(f"Unsupported browser: {browser_name}")
     else:
-        raise ValueError(f"Unsupported browser: {browser_name}")
+        raise ValueError(f"Unknown mode: {launch_mode}")
     
     allure.attach(
         name=driver.session_id,
