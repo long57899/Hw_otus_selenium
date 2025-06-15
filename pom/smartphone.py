@@ -4,16 +4,17 @@ from selenium.webdriver.common.by import By
 from pom.base_page import BasePage,OpenPageMixin
 import allure
 
+@allure.epic("Работаем со странице Смартфоны")
 class SmartphonePage(BasePage,OpenPageMixin):
+    @allure.step("Открываем страницу Смартфоны.")
     def __init__(self, browser, base_url):
         super().__init__(browser, base_url, path="/en-gb/catalog/smartphone" )
         self.open_page(self.path) 
 
+    @allure.feature("Собираем цены на странице.")   
     @allure.step("Произвожу копирование цен на странице Смартфоны.")
-    @property    
     def get_prices(self):
-        '''Сбор цен на странице Смартфоны.'''
-        self.logger.info("Copy prices on page Smartphone.")
+        self.logger.info("Copy prices on Main page.")
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price-new"))
         )
@@ -22,8 +23,9 @@ class SmartphonePage(BasePage,OpenPageMixin):
     
     @property
     def Currency_button(self):
-        return WebDriverWait(self.browser,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,'#form-currency')))
-   
+        return {"element":WebDriverWait(self.browser,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+        '#form-currency'))),"name":"Кнопка валют"}
+    
     def Currency(self,id_curruncy):
-        return WebDriverWait(self.browser,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 
-        f'#form-currency > div > ul > li:nth-child({id_curruncy}) > a')))
+        return {"element":WebDriverWait(self.browser,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 
+        f'#form-currency > div > ul > li:nth-child({id_curruncy}) > a'))),"name":"Валюта"}
